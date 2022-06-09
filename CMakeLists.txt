@@ -170,16 +170,25 @@ if(USE_BUNDLED_COEURL)
 		GIT_TAG        v0.1.2
 		)
 	FetchContent_MakeAvailable(coeurl)
-	target_link_libraries(matrix_client PUBLIC coeurl::coeurl)
-elseif(coeurl_DIR)
-	find_package(coeurl CONFIG REQUIRED)
-	target_link_libraries(matrix_client PUBLIC coeurl::coeurl)
+	set(COEURL_TARGET_NAME coeurl::coeurl)
 else()
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(coeurl REQUIRED IMPORTED_TARGET coeurl>=0.1.1)
-	target_link_libraries(matrix_client PUBLIC PkgConfig::coeurl)
+	# FindPkgConfig sets this as a cache variable, which breaks find_package
+	if(DEFINED coeurl_FOUND)
+		unset(coeurl_FOUND CACHE)
+	endif()
+	find_package(coeurl 0.1.1 CONFIG)
+	if (coeurl_FOUND)
+		set(COEURL_TARGET_NAME coeurl::coeurl)
+	endif()
 endif()
 
+if(NOT COEURL_TARGET_NAME)
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(coeurl REQUIRED IMPORTED_TARGET coeurl>=0.1.1)
+	set(COEURL_TARGET_NAME PkgConfig::coeurl)
+endif()
+
+target_link_libraries(matrix_client PUBLIC ${COEURL_TARGET_NAME})
 
 target_sources(matrix_client
 	PRIVATE
