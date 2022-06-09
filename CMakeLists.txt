@@ -263,6 +263,98 @@ target_sources(matrix_client
 	lib/structs/responses/version.cpp
 	lib/structs/responses/well-known.cpp
 	lib/structs/responses/public_rooms.cpp)
+
+function(_target_public_sources _target)
+	set(_sources "")
+	foreach(_file IN LISTS ARGN)
+		list(APPEND _sources
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${_file}>
+			$<INSTALL_INTERFACE:${_file}>)
+	endforeach()
+	target_sources(${_target} PUBLIC ${_sources})
+endfunction()
+
+_target_public_sources(matrix_client
+	include/mtx.hpp
+	include/mtx/common.hpp
+	include/mtx/errors.hpp
+	include/mtx/events.hpp
+	include/mtx/events/account_data/direct.hpp
+	include/mtx/events/account_data/fully_read.hpp
+	include/mtx/events/aliases.hpp
+	include/mtx/events/avatar.hpp
+	include/mtx/events/canonical_alias.hpp
+	include/mtx/events/collections.hpp
+	include/mtx/events/common.hpp
+	include/mtx/events/create.hpp
+	include/mtx/events/encrypted.hpp
+	include/mtx/events/encryption.hpp
+	include/mtx/events/ephemeral/receipt.hpp
+	include/mtx/events/ephemeral/typing.hpp
+	include/mtx/events/event_type.hpp
+	include/mtx/events/guest_access.hpp
+	include/mtx/events/history_visibility.hpp
+	include/mtx/events/join_rules.hpp
+	include/mtx/events/member.hpp
+	include/mtx/events/messages/audio.hpp
+	include/mtx/events/messages/emote.hpp
+	include/mtx/events/messages/file.hpp
+	include/mtx/events/messages/image.hpp
+	include/mtx/events/messages/location.hpp
+	include/mtx/events/messages/notice.hpp
+	include/mtx/events/messages/text.hpp
+	include/mtx/events/messages/video.hpp
+	include/mtx/events/mscs/image_packs.hpp
+	include/mtx/events/name.hpp
+	include/mtx/events/nheko_extensions/hidden_events.hpp
+	include/mtx/events/pinned_events.hpp
+	include/mtx/events/power_levels.hpp
+	include/mtx/events/presence.hpp
+	include/mtx/events/reaction.hpp
+	include/mtx/events/redaction.hpp
+	include/mtx/events/spaces.hpp
+	include/mtx/events/tag.hpp
+	include/mtx/events/tombstone.hpp
+	include/mtx/events/topic.hpp
+	include/mtx/events/unknown.hpp
+	include/mtx/events/voip.hpp
+	include/mtx/events/widget.hpp
+	include/mtx/events_impl.hpp
+	include/mtx/identifiers.hpp
+	include/mtx/lightweight_error.hpp
+	include/mtx/log.hpp
+	include/mtx/pushrules.hpp
+	include/mtx/requests.hpp
+	include/mtx/responses.hpp
+	include/mtx/responses/common.hpp
+	include/mtx/responses/create_room.hpp
+	include/mtx/responses/crypto.hpp
+	include/mtx/responses/device.hpp
+	include/mtx/responses/empty.hpp
+	include/mtx/responses/groups.hpp
+	include/mtx/responses/login.hpp
+	include/mtx/responses/media.hpp
+	include/mtx/responses/members.hpp
+	include/mtx/responses/messages.hpp
+	include/mtx/responses/notifications.hpp
+	include/mtx/responses/profile.hpp
+	include/mtx/responses/public_rooms.hpp
+	include/mtx/responses/register.hpp
+	include/mtx/responses/sync.hpp
+	include/mtx/responses/turn_server.hpp
+	include/mtx/responses/version.hpp
+	include/mtx/responses/well-known.hpp
+	include/mtx/secret_storage.hpp
+	include/mtx/user_interactive.hpp
+	include/mtxclient/crypto/client.hpp
+	include/mtxclient/crypto/objects.hpp
+	include/mtxclient/crypto/types.hpp
+	include/mtxclient/crypto/utils.hpp
+	include/mtxclient/http/client.hpp
+	include/mtxclient/http/client_impl.hpp
+	include/mtxclient/http/errors.hpp
+	include/mtxclient/utils.hpp)
+
 add_library(MatrixClient::MatrixClient ALIAS matrix_client)
 set_property(TARGET matrix_client  PROPERTY CXX_STANDARD 17)
 set_property(TARGET matrix_client  PROPERTY CXX_EXTENSIONS OFF)
@@ -377,7 +469,7 @@ if(BUILD_LIB_TESTS)
 
 	file(COPY tests/fixtures DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-	add_executable(client_api tests/client_api.cpp)
+	add_executable(client_api tests/client_api.cpp tests/test_helpers.hpp)
 	target_link_libraries(client_api
 		MatrixClient::MatrixClient
 		GTest::GTest
@@ -385,7 +477,7 @@ if(BUILD_LIB_TESTS)
 	target_include_directories(client_api PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(media_api tests/media_api.cpp)
+	add_executable(media_api tests/media_api.cpp tests/test_helpers.hpp)
 	target_link_libraries(media_api
 		MatrixClient::MatrixClient
 		GTest::GTest
@@ -393,35 +485,35 @@ if(BUILD_LIB_TESTS)
 	target_include_directories(media_api PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(e2ee tests/e2ee.cpp)
+	add_executable(e2ee tests/e2ee.cpp tests/test_helpers.hpp)
 	target_link_libraries(e2ee
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 	target_include_directories(e2ee PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(device tests/device.cpp)
+	add_executable(device tests/device.cpp tests/test_helpers.hpp)
 	target_link_libraries(device
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 	target_include_directories(device PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(utils tests/utils.cpp)
+	add_executable(utils tests/utils.cpp tests/test_helpers.hpp)
 	target_link_libraries(utils
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 	target_include_directories(utils PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(pushrules tests/pushrules.cpp)
+	add_executable(pushrules tests/pushrules.cpp tests/test_helpers.hpp)
 	target_link_libraries(pushrules
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 	target_include_directories(pushrules PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(connection tests/connection.cpp)
+	add_executable(connection tests/connection.cpp tests/test_helpers.hpp)
 	target_link_libraries(connection
 		MatrixClient::MatrixClient
 		GTest::GTest
@@ -429,43 +521,43 @@ if(BUILD_LIB_TESTS)
 	target_include_directories(connection PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-	add_executable(identifiers tests/identifiers.cpp)
+	add_executable(identifiers tests/identifiers.cpp tests/test_helpers.hpp)
 	target_link_libraries(identifiers
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 
-	add_executable(events tests/events.cpp)
+	add_executable(events tests/events.cpp tests/test_helpers.hpp)
 	target_link_libraries(events
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 
-	add_executable(messages tests/messages.cpp)
+	add_executable(messages tests/messages.cpp tests/test_helpers.hpp)
 	target_link_libraries(messages
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 
-	add_executable(responses tests/responses.cpp)
+	add_executable(responses tests/responses.cpp tests/test_helpers.hpp)
 	target_link_libraries(responses
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 
-	add_executable(requests tests/requests.cpp)
+	add_executable(requests tests/requests.cpp tests/test_helpers.hpp)
 	target_link_libraries(requests
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 
-	add_executable(errors tests/errors.cpp)
+	add_executable(errors tests/errors.cpp tests/test_helpers.hpp)
 	target_link_libraries(errors
 		MatrixClient::MatrixClient
 		GTest::GTest
 		GTest::Main)
 
-	add_executable(crypto tests/crypto.cpp)
+	add_executable(crypto tests/crypto.cpp tests/test_helpers.hpp)
 	target_link_libraries(crypto
 		MatrixClient::MatrixClient
 		GTest::GTest
