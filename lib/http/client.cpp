@@ -183,7 +183,11 @@ Client::set_server(const std::string &server)
 
         auto tmp = std::string(server_name.substr(colon_offset + 1));
         if (mtx::client::utils::is_number(tmp)) {
-            port_ = std::stoi(tmp);
+			try {
+				port_ = std::stoi(tmp);
+			} catch (...) {
+				port_ = port;
+			}
             return;
         }
     }
